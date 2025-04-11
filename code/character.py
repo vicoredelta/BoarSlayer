@@ -1,55 +1,54 @@
-import world
-
 class Character:
     def __init__(self, name):
         self.name = name
-        self.attributes = Attributes()
-        self.level = Leveling(1)
-        self.location = world.Location()
-
-    def engage():
-        pass
-
-    def wait():
-        pass
-
-class Attributes:
-    def __init__(self):
-        pass
-
-    def __init__(self, strength, intelligence):
-        self.strength = strength
-        self.intelligence = intelligence
-
-class Health:
-    def __init__(self):
-        pass
-
-    def __init__(self, health):
-        self.max_health = health
-        self.current_health = health
-
-class Mana:
-    def __init__(self):
-        pass
-
-    def __init__(self, mana):
-        self.max_mana = mana
-        self.current_mana = mana
-
-class Leveling:
-    def __init__(self, level):
-        self.level = level
+        self.max_health = 10
+        self.current_health = 10
+        self.max_mana = 10
+        self.current_mana = 10
+        self.strength = 3
+        self.intelligence = 3
+        self.level = 1
         self.xp = 0
 
-    # Returns true on levelup
+    def attack(self, opponent):
+        opponent.current_health = max(opponent.current_health - self.strength, 0)
+        return (self.name + " attacks " + opponent.name + " for " + str(self.strength) + " damage.")
+
+    def heal(self):
+        self.current_mana = max(self.current_mana - 5, 0)
+        self.current_health = min(self.current_health + self.intelligence*2, self.max_health)
+        return (self.name + " heals himself of " + str(self.intelligence*2) + " damage.")
+
     def add_xp(self, xp):
         self.xp = self.xp + xp
+        message = "You gain " + str(xp) + " experience."
+        if self.xp >= self.xp_for_levelup():
+            self.level_up()
+            message = message + " You level up!"
+        return message
 
-        if self.xp_to_levelup() >= self.xp:
+    def level_up(self):
+        self.level = self.level + 1
+        self.strength = self.strength + 1
+        self.intelligence = self.intelligence + 1
+        self.max_health = self.max_health + 2
+        self.current_health = self.current_health + 2
+        self.max_mana = self.max_mana + 2
+        self.current_mana = self.current_mana + 2
+
+    def xp_for_levelup(self):
+        return int(10 * self.level + pow(self.level-1, 2))
+
+    def display_character_info(self):
+        print(self.name)
+        print("Level: " + str(self.level) + "\tExperience: " + str(self.xp) + "/" + str(self.xp_for_levelup()))
+        print("Health: " + str(self.current_health) + "/" + str(self.max_health) +
+              "\tMana: " + str(self.current_mana) + "/" + str(self.max_mana))
+        print("Strength: " + str(self.strength) + "\tIntelligence: " + str(self.intelligence))
+        print()
+
+    def is_defeated(self):
+        if self.current_health <= 0:
             return True
         else:
             return False
-
-    def xp_to_levelup(self):
-        return self.level * 10
